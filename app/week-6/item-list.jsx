@@ -1,42 +1,31 @@
 "use client";
 
-import { useState } from 'react';
-import Item from './item';
-import itemsData from './items.json';
+import { useState } from "react";
+import Item from "./item";
 
-export default function ItemList() {
+export default function ItemList({ items }) {
   const [sortBy, setSortBy] = useState("name");
 
-  // Sort by name
+  let sortedItems = [];
+  let groupedItems = {};
+  let sortedCategories = [];
+
   if (sortBy === "name") {
-    var sortedItems = [...itemsData].sort((a, b) => {
-      return a.name.localeCompare(b.name);
-    });
-  }
-  
-  // Sort by category
-  else if (sortBy === "category") {
-    var sortedItems = [...itemsData].sort((a, b) => {
-      return a.category.localeCompare(b.category);
-    });
-  }
-  
-  // Group items by category
-  else if (sortBy === "grouped") {
-    var groupedItems = itemsData.reduce((acc, item) => {
+    sortedItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortBy === "category") {
+    sortedItems = [...items].sort((a, b) =>
+      a.category.localeCompare(b.category)
+    );
+  } else if (sortBy === "grouped") {
+    groupedItems = [...items].reduce((acc, item) => {
       const category = item.category;
-      if (!acc[category]) {
-        acc[category] = [];
-      }
+      if (!acc[category]) acc[category] = [];
       acc[category].push(item);
       return acc;
     }, {});
 
-    // Sort categories alphabetically
-    var sortedCategories = Object.keys(groupedItems).sort();
-    
-    // Sort items alphabetically
-    sortedCategories.forEach(category => {
+    sortedCategories = Object.keys(groupedItems).sort();
+    sortedCategories.forEach((category) => {
       groupedItems[category].sort((a, b) => a.name.localeCompare(b.name));
     });
   }
@@ -48,8 +37,8 @@ export default function ItemList() {
         <button
           onClick={() => setSortBy("name")}
           className={`px-4 py-2 sm:mr-2 rounded transition-colors ${
-            sortBy === "name" 
-              ? "bg-blue-500 text-white hover:bg-blue-600" 
+            sortBy === "name"
+              ? "bg-blue-500 text-white hover:bg-blue-600"
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >
@@ -58,8 +47,8 @@ export default function ItemList() {
         <button
           onClick={() => setSortBy("category")}
           className={`px-4 py-2 sm:mr-2 rounded transition-colors ${
-            sortBy === "category" 
-              ? "bg-blue-500 text-white hover:bg-blue-600" 
+            sortBy === "category"
+              ? "bg-blue-500 text-white hover:bg-blue-600"
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >
@@ -68,8 +57,8 @@ export default function ItemList() {
         <button
           onClick={() => setSortBy("grouped")}
           className={`px-4 py-2 rounded transition-colors ${
-            sortBy === "grouped" 
-              ? "bg-blue-500 text-white hover:bg-blue-600" 
+            sortBy === "grouped"
+              ? "bg-blue-500 text-white hover:bg-blue-600"
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >
@@ -80,9 +69,9 @@ export default function ItemList() {
       {/* Regular Sort */}
       {sortBy !== "grouped" && (
         <ul className="space-y-2 sm:space-y-4 w-full max-w-2xl">
-          {sortedItems.map((item) => (
-            <Item 
-              key={item.id}
+          {sortedItems.map((item, index) => (
+            <Item
+              key={item.id ?? index}
               name={item.name}
               quantity={item.quantity}
               category={item.category}
@@ -100,9 +89,9 @@ export default function ItemList() {
                 {category}
               </h2>
               <ul className="space-y-2">
-                {groupedItems[category].map((item) => (
-                  <Item 
-                    key={item.id}
+                {groupedItems[category].map((item, index) => (
+                  <Item
+                    key={item.id ?? index}
                     name={item.name}
                     quantity={item.quantity}
                     category={item.category}
